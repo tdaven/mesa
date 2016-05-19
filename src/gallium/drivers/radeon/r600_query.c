@@ -1108,7 +1108,7 @@ void r600_query_init_backend_mask(struct r600_common_context *ctx)
 			return;
 		}
 	}
-
+puts("before backend init");
 	/* otherwise backup path for older kernels */
 
 	/* create buffer for event data */

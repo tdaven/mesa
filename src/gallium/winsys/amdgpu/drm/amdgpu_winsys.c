@@ -503,12 +503,14 @@ amdgpu_winsys_create(int fd, radeon_screen_create_t screen_create)
 
    /* Initialize the amdgpu device. This should always return the same pointer
     * for the same fd. */
+puts("before device_init");
    r = amdgpu_device_initialize(fd, &drm_major, &drm_minor, &dev);
    if (r) {
       pipe_mutex_unlock(dev_tab_mutex);
       fprintf(stderr, "amdgpu: amdgpu_device_initialize failed.\n");
       return NULL;
    }
+puts("after device_init");
 
    /* Lookup a winsys if we have already created one for this device. */
    ws = util_hash_table_get(dev_tab, dev);
@@ -529,8 +531,10 @@ amdgpu_winsys_create(int fd, radeon_screen_create_t screen_create)
    ws->info.drm_major = drm_major;
    ws->info.drm_minor = drm_minor;
 
+puts("before winsys_init");
    if (!do_winsys_init(ws, fd))
       goto fail;
+puts("after winsys_init");
 
    /* Create managers. */
    pb_cache_init(&ws->bo_cache, 500000, ws->check_vm ? 1.0f : 2.0f, 0,
@@ -564,12 +568,14 @@ amdgpu_winsys_create(int fd, radeon_screen_create_t screen_create)
     *
     * Alternatively, we could create the screen based on "ws->gen"
     * and link all drivers into one binary blob. */
+puts("before screen_create");
    ws->base.screen = screen_create(&ws->base);
    if (!ws->base.screen) {
       amdgpu_winsys_destroy(&ws->base);
       pipe_mutex_unlock(dev_tab_mutex);
       return NULL;
    }
+puts("after screen_create");
 
    util_hash_table_set(dev_tab, dev, ws);
 
